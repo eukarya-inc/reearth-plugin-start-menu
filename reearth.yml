@@ -1,0 +1,111 @@
+id: start-menu
+name: スタートメニュープラグイン
+version: 1.0.0
+extensions:
+  - id: start-menu
+    type: widget
+    name: スタートメニュープラグイン
+    schema:
+      groups:
+        - id: page_setting
+          title: Page
+          list: true
+          description: You may change the page setting here.
+          representativeField: page_type
+          fields:
+            - id: page_type
+              type: string
+              title: Page Type
+              defaultValue: welcome_page
+              choices:
+                - key: welcome_page
+                  label: Welcome Page
+                - key: md_page
+                  label: MD Content Page
+                - key: tutorial_page
+                  label: Tutorial Page
+                - key: agreement_page
+                  label: Agreement Page
+            - id: page_title
+              type: string
+              title: Title
+              availableIf:
+                field: page_type
+                type: string
+                value: welcome_page
+            - id: page_description
+              type: string
+              title: Description
+              ui: multiline
+              availableIf:
+                field: page_type
+                type: string
+                value: welcome_page
+            - id: media_type
+              type: string
+              title: Media Type
+              defaultValue: image_type
+              choices:
+                - key: image_type
+                  label: Image
+                - key: video_type
+                  label: Video
+              availableIf:
+                field: page_type
+                type: string
+                value: welcome_page
+            - id: image_url
+              type: url
+              ui: image
+              title: Image
+              availableIf:
+                field: media_type
+                type: string
+                value: image_type
+            - id: video_url
+              type: url
+              ui: video
+              title: Video URL
+              availableIf:
+                field: media_type
+                type: string
+                value: video_type
+            - id: thumbnail_video_url
+              type: url
+              ui: image
+              title: Thumbnail Video URL
+              availableIf:
+                field: media_type
+                type: string
+                value: video_type
+            - id: md_content
+              type: string
+              title: MD Content
+              ui: multiline
+              description: For markdown content
+              availableIf:
+                field: page_type
+                type: string
+                value: md_page
+            - id: agree_content
+              type: string
+              title: Agreement
+              ui: multiline
+              description: Markdown content for agreement page
+              availableIf:
+                field: page_type
+                type: string
+                value: agreement_page
+        - id: apperance
+          title: Apperance
+          fields:
+            - id: primary_color
+              type: string
+              title: Primary Color
+              ui: color
+              defaultValue: "#0085BE"
+            - id: bg_color
+              type: string
+              title: Background Color
+              ui: color
+              defaultValue: "#000"
