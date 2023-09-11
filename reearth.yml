@@ -1,10 +1,11 @@
-id: start-menu
-name: スタートメニュープラグイン
+id: plateau-start
+name: PLATEAUスタートメニュープラグイン
 version: 1.0.0
 extensions:
-  - id: start-menu
+  - id: plateau-start
     type: widget
-    name: スタートメニュープラグイン
+    name: PLATEAUスタートメニュープラグイン
+    singleOnly: true
     schema:
       groups:
         - id: page_setting
@@ -62,6 +63,10 @@ extensions:
                 field: media_type
                 type: string
                 value: image_type
+              availableIf:
+                field: page_type
+                type: string
+                value: welcome_page
             - id: video_url
               type: url
               ui: video
@@ -70,6 +75,10 @@ extensions:
                 field: media_type
                 type: string
                 value: video_type
+              availableIf:
+                field: page_type
+                type: string
+                value: welcome_page
             - id: thumbnail_video_url
               type: url
               ui: image
@@ -109,3 +118,8 @@ extensions:
               title: Background Color
               ui: color
               defaultValue: "#000"
+    widgetLayout:
+      defaultLocation:
+        zone: inner
+        section: center
+        area: top
