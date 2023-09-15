@@ -1,10 +1,10 @@
-id: plateau-start
-name: PLATEAUスタートメニュープラグイン
+id: start-menu
+name: スタートメニュープラグイン
 version: 1.0.0
 extensions:
-  - id: plateau-start
+  - id: start-menu
     type: widget
-    name: PLATEAUスタートメニュープラグイン
+    name: スタートメニュープラグイン
     singleOnly: true
     schema:
       groups:
