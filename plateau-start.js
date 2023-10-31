@@ -101,6 +101,7 @@ reearth.ui.show(
     let reearth = e.source.reearth;
     hvp = reearth.viewport.height;
     wvp = reearth.viewport.width;
+
     if (e.data.type === 'mousedata') {
       hvp = e.data.payload.height + reearth.viewport.height;
       wvp = e.data.payload.width + reearth.viewport.width;
@@ -128,6 +129,7 @@ reearth.ui.show(
     }
 
     let inputData = "123";
+    let isMobile = reearth.viewport.isMobile;
     const wrapper = document.getElementById("wrapper");
     wrapper.style.height = hvp + "px";
     wrapper.style.width = wvp + "px";
@@ -147,7 +149,7 @@ reearth.ui.show(
       }
     }
     //send data to modal
-    parent.postMessage({ type: "sendToHelpScreen", inputData, hvp, wvp }, "*");
+    parent.postMessage({ type: "sendToHelpScreen", inputData, hvp, wvp, isMobile }, "*");
   });
   function showHelpScreen() {
     parent.postMessage({ type: "showHelpScreen" }, "*");
@@ -187,6 +189,7 @@ const modal = `
   #wrapper {
     position: absolute;
     width: 856px;
+    max-width: 100%;
     height: 541px;
     box-sizing: border-box;
     padding: 32px;
@@ -203,12 +206,17 @@ const modal = `
   }
 
   #header {
-    position: relative
+    position: relative;
+    height: 0;
+    width: 0;
+    display: none;
   }
 
   #content {
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   #close-icon {
@@ -288,7 +296,7 @@ const modal = `
   #main-section {
     /* background-color: aquamarine; */
     max-height: 408px;
-    max-width: 792px;
+    max-width: 100%;
     height: 408px;
     width: 792px;
     margin-bottom: 32px;
@@ -463,7 +471,7 @@ const modal = `
 
   #pagination {
     display: flex;
-    gap: 18px;
+    gap: 1rem;
   }
 
   /* end agreement page */
@@ -482,6 +490,7 @@ const modal = `
         <input type="checkbox" id="welcome-checkbox" />&nbsp;次回から表示しない
       </label>
     </section>
+
     <div class="prev-next">
       <button id="prev-btn" class="main-btn" style="display: none;">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="21" viewBox="0 0 20 21" fill="none">
@@ -502,6 +511,8 @@ const modal = `
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script src='https://unpkg.com/react-player/dist/ReactPlayer.standalone.js'></script>
+
+
 <script>
   var cookie;
 
@@ -520,6 +531,7 @@ const modal = `
     if (e.source !== parent) return;
 
     let modalData;
+    let isMobile;
     let hvp, wvp;
 
     if (e.data.hvp) {
@@ -547,12 +559,13 @@ const modal = `
 
     if (e.data.inputData) {
       modalData = e.data.inputData;
+      isMobile = e.data.isMobile;
 
       if (isEmptyObject(modalData)) {
         document.getElementById("main-section").style.display = "block";
         document.getElementById("main-section").innerHTML = '<div class="welcome-title-error" style=>データを入力してからリロードしてページを表示してください。</div>';
       } else {
-        handleModalData(modalData);
+        handleModalData(modalData, isMobile);
       }
     }
 
@@ -584,7 +597,7 @@ const modal = `
     return parsedContent;
   }
 
-  function handleModalData(data) {
+  function handleModalData(data, isMobile) {
     if (data.apperance?.primary_color) {
       primaryColor = data.apperance.primary_color;
     }
@@ -651,6 +664,10 @@ const modal = `
         const useBtn = document.getElementById("use-btn");
         const nextBtn = document.getElementById("next-btn");
         const prevBtn = document.getElementById("prev-btn");
+
+        if (isMobile) {
+          useBtn.style.fontSize = "10px";
+        }
 
         const svgPrevTransparent = '<svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16.875 10.5H3.125M8.75 4.875 3.125 10.5l5.625 5.625" stroke="" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 
@@ -738,6 +755,7 @@ const modal = `
             mainContent.style.height = "375px";
             mainContent.style.maxHeight = "375px";
             mainContent.style.backgroundColor = "#FFFFFF";
+            helpImg.style.display = "none";
 
             helpImg.setAttribute("src", "");
             helpImg.display = "none";
@@ -815,6 +833,7 @@ const modal = `
 
             break;
           case "tutorial_page":
+
             mainSection.style.display = "block";
 
             mainContent.style.display = "none";
@@ -823,6 +842,8 @@ const modal = `
             mainContent.style.maxHeight = "395px";
 
             helpImg.setAttribute("src", helpImage);
+            helpImg.style.display = "block";
+
             helpImg.display = "block";
 
             spanAgreeCheckbox.style.display = "none";
@@ -891,17 +912,20 @@ const modal = `
 
             break;
           case "agreement_page":
-            mainSection.style.display = "block";
 
             helpImg.setAttribute("src", "");
+            helpImg.style.display = "none";
             helpImage.display = "none";
 
+            mainSection.style.display = "block";
             mainContent.style.display = "flex";
             mainContent.style.backgroundColor = "#F5F5F5";
             mainContent.style.height = "358px";
             mainContent.style.maxHeight = "358px";
             mainContent.style.marginLeft = "0px";
             mainContent.style.marginRight = "0px";
+
+
 
             //create an welcome checkbox for each agreement page
 
@@ -1053,16 +1077,24 @@ const modal = `
 
             break;
           default:
+
             spanAgreeCheckbox.style.display = "none";
+
+
             mainContent.style.marginLeft = "32px";
             mainContent.style.marginRight = "32px";
             mainSection.style.display = "block";
             mainContent.style.height = "";
             mainContent.style.maxHeight = "395px";
-            helpImg.setAttribute("src", "");
-            helpImg.display = "none";
             mainContent.style.display = "block";
             mainContent.style.backgroundColor = "#FFFFFF";
+
+
+            helpImg.setAttribute("src", "");
+            helpImg.display = "none";
+            helpImg.style.display = "none";
+
+
 
             //handle button show
             if (pageIndex === 0 && pageIndex === sortedData.length - 1) {
@@ -1082,6 +1114,7 @@ const modal = `
 
             } else if (pageIndex === 0 && pageIndex !== sortedData.length - 1) {
               //1st page
+
               //show welcome checkbox
               displayWelcomeCheckbox("flex");
 
@@ -1096,6 +1129,7 @@ const modal = `
 
             } else if (pageIndex === sortedData.length - 1) {
               // Handle the last page
+
 
               //hide welcome checkbox
               displayWelcomeCheckbox("none");
@@ -1112,6 +1146,7 @@ const modal = `
             }
             else {
               // middle page
+
               //hide welcome checkbox
               displayWelcomeCheckbox("none");
 
@@ -1133,11 +1168,19 @@ const modal = `
             mainContent.innerHTML = "";
             const welcomeTitleDiv = document.createElement("div");
             welcomeTitleDiv.classList.add("welcome-title");
+            welcomeTitleDiv.id = "welcome-title";
             welcomeTitleDiv.textContent = welcomeTitle;
 
             const welcomeDescriptionDiv = document.createElement("div");
             welcomeDescriptionDiv.classList.add("welcome-description");
+            welcomeDescriptionDiv.id = "welcome-description";
             welcomeDescriptionDiv.textContent = welcomeDescription;
+
+            if (isMobile) {
+              // console.log("handle mobile view in default page!");
+              welcomeTitleDiv.style.marginLeft = 0;
+              welcomeDescriptionDiv.style.marginLeft = 0;
+            }
 
             //handle media
             const defaultbg = '<svg width="2600" height="1750.208" viewBox="0 0 2600 1750.208" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill="#DDD" d="M0 0h2600v1750.208H0V0z"/></svg>';
@@ -1249,6 +1292,8 @@ const modal = `
 
 
 </script>
+<!-- <script src="//cdn.jsdelivr.net/npm/eruda"></script>
+<script>eruda.init();</script> -->
 `;
 
 reearth.on("update", send);
@@ -1291,7 +1336,8 @@ reearth.ui.postMessage({ setFullScreen: "set full" }, "*");
 isSetFullScreen = true;
 }
 } else if (msg.type === "sendToHelpScreen") {
-reearth.modal.postMessage({ inputData: msg.inputData, hvp: msg.hvp, wvp: msg.wvp }, "*");
+reearth.modal.postMessage({ inputData: msg.inputData, hvp: msg.hvp, wvp: msg.wvp, isMobile: reearth.viewport.isMobile },
+"*");
 } else if (msg.type === "closeModal") {
 isCloseCheck = true;
 reearth.modal.close(modal);
